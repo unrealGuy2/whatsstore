@@ -1,0 +1,105 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.card {
+  background: $white;
+  padding: $spacing-xl;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  border: 1px solid $gray-100;
+}
+
+.header {
+  margin-bottom: $spacing-lg;
+  border-bottom: 1px solid $gray-100;
+  padding-bottom: $spacing-md;
+
+  h1 {
+    font-size: 1.5rem;
+    color: $black;
+    margin-bottom: $spacing-xs;
+  }
+
+  p {
+    color: $gray-500;
+    font-size: $font-size-sm;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $black;
+  }
+
+  input {
+    padding: $spacing-md;
+    border: 1px solid $gray-100;
+    border-radius: $radius-md;
+    font-size: $font-size-base;
+
+    &:focus {
+      outline: none;
+      border-color: $wa-green;
+    }
+    
+    &:disabled {
+      background-color: $gray-50;
+      cursor: not-allowed;
+      color: $gray-500;
+    }
+  }
+}
+
+.helper {
+  font-size: 0.75rem;
+  color: $gray-500;
+}
+
+.saveBtn {
+  @include btn-base;
+  background-color: $black;
+  color: $white;
+  margin-top: $spacing-md;
+  
+  &:hover {
+    background-color: lighten($black, 15%);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
+}
+
+.successMessage {
+  background-color: rgba($wa-green, 0.1);
+  color: $wa-dark-teal;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+  text-align: center;
+  font-weight: 500;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

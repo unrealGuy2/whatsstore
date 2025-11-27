@@ -1,66 +1,72 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import styles from './page.module.scss';
+import { Store } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className={styles.main}>
+      {/* NEW: Simple Navbar */}
+      <nav style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '1rem 2rem',
+        borderBottom: '1px solid #e9edef',
+        background: 'white'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '1.2rem', color: '#25D366' }}>
+          <Store /> WhatsStore
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <Link href="/login" style={{ fontWeight: 500, color: '#666' }}>
+            Login
+          </Link>
+          <Link href="/signup" style={{ 
+            backgroundColor: '#25D366', 
+            color: 'white', 
+            padding: '0.5rem 1rem', 
+            borderRadius: '8px',
+            fontWeight: 500
+          }}>
+            Get Started
+          </Link>
         </div>
-      </main>
-    </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <h1>
+          Sell on WhatsApp <br />
+          <span>Like a Pro.</span>
+        </h1>
+        <p>
+          Turn your WhatsApp number into a powerful mini-store. 
+          Upload products, share your link, and get orders directly as messages.
+        </p>
+        
+        <Link href="/signup" className={styles.ctaButton}>
+          Create My Store
+        </Link>
+      </section>
+
+      {/* Features Section */}
+      <section className={styles.features}>
+        <h2>How It Works</h2>
+        <div className={styles.grid}>
+          <div className={styles.card}>
+            <h3>1. Create Account</h3>
+            <p>Sign up and get your unique store link instantly.</p>
+          </div>
+          <div className={styles.card}>
+            <h3>2. Add Products</h3>
+            <p>Upload photos, prices, and details to your dashboard.</p>
+          </div>
+          <div className={styles.card}>
+            <h3>3. Get Orders</h3>
+            <p>Customers checkout and send the order to your WhatsApp.</p>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

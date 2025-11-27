@@ -1,0 +1,121 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba($black, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  padding: $spacing-md;
+}
+
+.modal {
+  background: $white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  animation: slideUp 0.3s ease-out;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+
+  h2 {
+    font-size: 1.25rem;
+    color: $black;
+  }
+
+  button {
+    background: none;
+    color: $gray-500;
+    cursor: pointer;
+    
+    &:hover {
+      color: $danger;
+    }
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: 500;
+    margin-bottom: $spacing-xs;
+    display: block;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: $spacing-md;
+    border: 1px solid $gray-100;
+    border-radius: $radius-md;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: $wa-green;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+
+  button {
+    flex: 1;
+    @include btn-base;
+  }
+}
+
+.cancelBtn {
+  background-color: $gray-100;
+  color: $black;
+  
+  &:hover {
+    // Replaced darken() with filter to fix SASS warning
+    background-color: $gray-100;
+    filter: brightness(0.95);
+  }
+}
+
+.saveBtn {
+  background-color: $wa-green;
+  color: $white;
+  
+  &:hover {
+    background-color: $wa-teal;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

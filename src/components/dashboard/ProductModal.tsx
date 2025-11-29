@@ -8,7 +8,7 @@ import styles from './ProductModal.module.scss';
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onProductAdded: () => void; // To refresh the list after adding
+  onProductAdded: () => void;
 }
 
 export default function ProductModal({ isOpen, onClose, onProductAdded }: ProductModalProps) {
@@ -17,6 +17,7 @@ export default function ProductModal({ isOpen, onClose, onProductAdded }: Produc
     name: '',
     price: '',
     description: '',
+    category: 'General', // Default value
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -27,13 +28,11 @@ export default function ProductModal({ isOpen, onClose, onProductAdded }: Produc
     setIsLoading(true);
 
     try {
-      // 1. Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       let imageUrl = null;
 
-      // 2. Upload Image (if selected)
       if (imageFile) {
         const fileExt = imageFile.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}.${fileExt}`;
@@ -44,7 +43,6 @@ export default function ProductModal({ isOpen, onClose, onProductAdded }: Produc
 
         if (uploadError) throw uploadError;
 
-        // Get the Public URL
         const { data: publicUrlData } = supabase.storage
           .from('product-images')
           .getPublicUrl(fileName);
@@ -52,7 +50,6 @@ export default function ProductModal({ isOpen, onClose, onProductAdded }: Produc
         imageUrl = publicUrlData.publicUrl;
       }
 
-      // 3. Insert into Database
       const { error: dbError } = await supabase
         .from('products')
         .insert([
@@ -62,15 +59,15 @@ export default function ProductModal({ isOpen, onClose, onProductAdded }: Produc
             price: parseFloat(formData.price),
             description: formData.description,
             image_url: imageUrl,
+            category: formData.category, // Save the category
           }
         ]);
 
       if (dbError) throw dbError;
 
-      // 4. Cleanup and Close
-      setFormData({ name: '', price: '', description: '' });
+      setFormData({ name: '', price: '', description: '', category: 'General' });
       setImageFile(null);
-      onProductAdded(); // Tell parent to refresh
+      onProductAdded();
       onClose();
 
     } catch (error: any) {
@@ -89,31 +86,54 @@ export default function ProductModal({ isOpen, onClose, onProductAdded }: Produc
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          {/* Product Name */}
+          {/* Name */}
           <div>
             <label>Product Name</label>
             <input 
               type="text" 
               required
-              placeholder="e.g. Vintage T-Shirt"
+              placeholder="e.g. Jollof Rice"
               value={formData.name}
               onChange={e => setFormData({...formData, name: e.target.value})}
             />
           </div>
 
-          {/* Price */}
-          <div>
-            <label>Price (₦)</label>
-            <input 
-              type="number" 
-              required
-              placeholder="e.g. 5000"
-              value={formData.price}
-              onChange={e => setFormData({...formData, price: e.target.value})}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            {/* Price */}
+            <div>
+              <label>Price (₦)</label>
+              <input 
+                type="number" 
+                required
+                placeholder="1500"
+                value={formData.price}
+                onChange={e => setFormData({...formData, price: e.target.value})}
+              />
+            </div>
+
+            {/* Category Input */}
+            <div>
+              <label>Category</label>
+              <input 
+                type="text" 
+                required
+                placeholder="e.g. Food"
+                value={formData.category}
+                onChange={e => setFormData({...formData, category: e.target.value})}
+                list="category-suggestions" 
+              />
+              {/* Simple autocomplete helper */}
+              <datalist id="category-suggestions">
+                <option value="Food" />
+                <option value="Drinks" />
+                <option value="Snacks" />
+                <option value="Shoes" />
+                <option value="Clothes" />
+              </datalist>
+            </div>
           </div>
 
-          {/* Image Upload */}
+          {/* Image */}
           <div>
             <label>Product Image</label>
             <div style={{ position: 'relative' }}>

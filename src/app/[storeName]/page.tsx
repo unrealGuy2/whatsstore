@@ -7,7 +7,6 @@ import styles from './page.module.scss';
 import { Product, Vendor } from '@/types';
 import { useCartStore } from '@/store/useCartStore';
 import { Loader2 } from 'lucide-react';
-// 1. Import the Modal
 import CartModal from '@/components/store/CartModal';
 
 export default function StorePage({ params }: { params: Promise<{ storeName: string }> }) {
@@ -16,8 +15,6 @@ export default function StorePage({ params }: { params: Promise<{ storeName: str
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // 2. Add state for the Modal
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const addToCart = useCartStore((state) => state.addToCart);
@@ -27,6 +24,7 @@ export default function StorePage({ params }: { params: Promise<{ storeName: str
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // 1. Get Vendor
         const { data: vendorData, error: vendorError } = await supabase
           .from('profiles')
           .select('*')
@@ -36,11 +34,13 @@ export default function StorePage({ params }: { params: Promise<{ storeName: str
         if (vendorError || !vendorData) return;
         setVendor(vendorData);
 
+        // 2. Get Products (Ordered by category so they group nicely)
         const { data: productData } = await supabase
           .from('products')
           .select('*')
           .eq('vendor_id', vendorData.id)
-          .eq('is_active', true);
+          .eq('is_active', true)
+          .order('category', { ascending: true }); // Important for grouping
 
         setProducts(productData || []);
       } catch (err) {
@@ -52,7 +52,13 @@ export default function StorePage({ params }: { params: Promise<{ storeName: str
     fetchData();
   }, [storeName]);
 
-  // (We removed handleCheckout from here because it's now in the Modal!)
+  // --- HELPER: Group products by category ---
+  const groupedProducts = products.reduce((acc, product) => {
+    const cat = product.category || 'General';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(product);
+    return acc;
+  }, {} as Record<string, Product[]>);
 
   if (loading) return (
     <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -69,35 +75,54 @@ export default function StorePage({ params }: { params: Promise<{ storeName: str
         <p>WhatsApp: +{vendor.whatsapp_number}</p>
       </header>
 
-      <div className={styles.grid}>
-        {products.map((product) => (
-          <div key={product.id} className={styles.productCard}>
-            <div className={styles.imageWrapper}>
-              {product.image_url ? (
-                <img src={product.image_url} alt={product.name} />
-              ) : (
-                <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#999' }}>
-                  No Image
+      {/* NEW: Render Groups */}
+      {Object.keys(groupedProducts).length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#888', marginTop: '2rem' }}>No products yet.</p>
+      ) : (
+        Object.entries(groupedProducts).map(([category, items]) => (
+          <section key={category} style={{ marginBottom: '2rem' }}>
+            {/* Category Title */}
+            <h2 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: 'bold', 
+              margin: '0 auto 1rem', 
+              maxWidth: '1024px', 
+              padding: '0 1rem',
+              color: '#111b21',
+              borderLeft: '4px solid #25D366', // Little green accent
+              paddingLeft: '12px'
+            }}>
+              {category}
+            </h2>
+
+            {/* Grid for this Category */}
+            <div className={styles.grid}>
+              {items.map((product) => (
+                <div key={product.id} className={styles.productCard}>
+                  <div className={styles.imageWrapper}>
+                    {product.image_url ? (
+                      <img src={product.image_url} alt={product.name} />
+                    ) : (
+                      <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#999' }}>
+                        No Image
+                      </div>
+                    )}
+                  </div>
+                  <div className={styles.cardContent}>
+                    <h3>{product.name}</h3>
+                    <p className={styles.price}>₦{product.price.toLocaleString()}</p>
+                    <button className={styles.addBtn} onClick={() => addToCart(product)}>
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-            <div className={styles.cardContent}>
-              <h3>{product.name}</h3>
-              <p className={styles.price}>₦{product.price.toLocaleString()}</p>
-              
-              <button 
-                className={styles.addBtn}
-                onClick={() => addToCart(product)}
-              >
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          </section>
+        ))
+      )}
 
       {cart.length > 0 && (
-        // 3. Update onClick to open Modal
         <div className={styles.floatingCart} onClick={() => setIsCartOpen(true)}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ background: 'white', color: 'black', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '12px', fontWeight: 'bold' }}>
@@ -109,7 +134,6 @@ export default function StorePage({ params }: { params: Promise<{ storeName: str
         </div>
       )}
 
-      {/* 4. Render the Modal */}
       <CartModal 
         isOpen={isCartOpen} 
         onClose={() => setIsCartOpen(false)} 

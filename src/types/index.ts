@@ -13,10 +13,10 @@ export interface Product {
   price: number;
   description?: string;
   image_url: string;
+  category: string; // <--- NEW FIELD
   created_at: string;
 }
 
-// Ensure this is here!
 export interface CartItem extends Product {
   quantity: number;
 }

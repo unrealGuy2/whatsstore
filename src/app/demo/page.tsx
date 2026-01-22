@@ -1,25 +1,26 @@
-// src/app/demo/page.tsx
 "use client";
 import React, { useState } from 'react';
 import styles from './demo.module.css';
 
-// --- MOCK DATA ---
+// --- MOCK DATA (With Colors for Bad Network) ---
 const PRODUCTS = [
   {
     id: 1,
-    name: "BIO 101 Past Questions (2015-2024)",
+    name: "BIO 101 Past Questions",
     price: "1,500",
     vendor: "Scholar James",
     category: "Academic",
-    image: "https://placehold.co/600x400/2563eb/ffffff?text=BIO+101+PQ",
+    color: "#bfdbfe", // Light Blue
+    initials: "PQ"
   },
   {
     id: 2,
-    name: "Nike Air Force 1 (White)",
+    name: "Nike Air Force 1",
     price: "25,000",
     vendor: "Kicks By Sola",
     category: "Fashion",
-    image: "https://placehold.co/600x400/e11d48/ffffff?text=Nike+Sneakers",
+    color: "#fecaca", // Light Red
+    initials: "NK"
   },
   {
     id: 3,
@@ -27,7 +28,8 @@ const PRODUCTS = [
     price: "3,500",
     vendor: "Connect Data",
     category: "Services",
-    image: "https://placehold.co/600x400/fbbf24/000000?text=MTN+DATA",
+    color: "#fde047", // Yellow
+    initials: "MTN"
   },
   {
     id: 4,
@@ -35,23 +37,26 @@ const PRODUCTS = [
     price: "12,000",
     vendor: "Engr. Tobi",
     category: "Academic",
-    image: "https://placehold.co/600x400/4b5563/ffffff?text=Calculator",
+    color: "#d1d5db", // Grey
+    initials: "FX"
   },
   {
     id: 5,
-    name: "Student Perfume Oil (Vanilla)",
+    name: "Student Perfume Oil",
     price: "3,000",
     vendor: "Scented Vibes",
     category: "Fashion",
-    image: "https://placehold.co/600x400/9333ea/ffffff?text=Perfume",
+    color: "#e9d5ff", // Purple
+    initials: "OIL"
   },
   {
     id: 6,
-    name: "Jollof + Turkey (Obodo Special)",
+    name: "Jollof + Turkey",
     price: "4,500",
     vendor: "Obodo Kitchens",
     category: "Food",
-    image: "https://placehold.co/600x400/ea580c/ffffff?text=Jollof+Rice",
+    color: "#fdba74", // Orange
+    initials: "Rice"
   },
 ];
 
@@ -59,6 +64,7 @@ const CATEGORIES = ["All", "Academic", "Fashion", "Food", "Services"];
 
 export default function FacultyDemo() {
   const [activeCat, setActiveCat] = useState("All");
+  const [showNotice, setShowNotice] = useState(true);
 
   const filteredProducts = activeCat === "All" 
     ? PRODUCTS 
@@ -72,6 +78,20 @@ export default function FacultyDemo() {
         <h1 className={styles.title}>Physical Sciences<br/><span>Marketplace</span></h1>
         <p className={styles.subtitle}>Powered by the Faculty Association</p>
       </header>
+
+      {/* Announcement Banner (New Feature) */}
+      {showNotice && (
+        <div className={styles.notice}>
+          <div className={styles.noticeContent}>
+            <span className={styles.noticeIcon}>📢</span>
+            <p>
+              <strong>Faculty News:</strong> Want to be a Verified Vendor? 
+              <span className={styles.link}> Get your Blue Tick here!</span>
+            </p>
+          </div>
+          <button onClick={() => setShowNotice(false)} className={styles.closeBtn}>×</button>
+        </div>
+      )}
 
       {/* Search Bar */}
       <div className={styles.searchContainer}>
@@ -96,16 +116,28 @@ export default function FacultyDemo() {
       <div className={styles.grid}>
         {filteredProducts.map(product => (
           <div key={product.id} className={styles.card}>
-            <div className={styles.imageWrapper}>
-              <img src={product.image} alt={product.name} className={styles.productImage} />
+            {/* Colored Box Fallback (Network Safe) */}
+            <div 
+              className={styles.imageWrapper} 
+              style={{
+                backgroundColor: product.color, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center'
+              }}
+            >
+              <span style={{fontWeight: 'bold', fontSize: '20px', color: '#444'}}>
+                {product.initials}
+              </span>
               <span className={styles.catTag}>{product.category}</span>
             </div>
+
             <div className={styles.cardBody}>
               <h3 className={styles.productName}>{product.name}</h3>
               <p className={styles.vendor}>Sold by: {product.vendor}</p>
               <div className={styles.row}>
                 <span className={styles.price}>₦{product.price}</span>
-                <button className={styles.buyBtn}>Chat Vendor</button>
+                <button className={styles.buyBtn}>Chat</button>
               </div>
             </div>
           </div>
